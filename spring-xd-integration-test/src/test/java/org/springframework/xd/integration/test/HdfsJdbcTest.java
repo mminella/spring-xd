@@ -16,17 +16,16 @@
 
 package org.springframework.xd.integration.test;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.UUID;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import org.springframework.xd.test.fixtures.HdfsJdbcJob;
 import org.springframework.xd.test.fixtures.JdbcSink;
 
+import java.util.UUID;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Asserts that this job will read the specified file from hdfs and place the results into the database.
@@ -79,6 +78,49 @@ public class HdfsJdbcTest extends AbstractIntegrationTest {
 		assertEquals(data,
 				jdbcSink.getJdbcTemplate().queryForObject(query, String.class));
 	}
+
+//	/**
+//	 * Asserts that hdfsJdbcJob has written the test data from a file on hdfs to the table.
+//	 *
+//	 */
+//	@Test
+//	public void testPartitionedHdfsJdbcJob() {
+//		String data = UUID.randomUUID().toString();
+//		HdfsJdbcJob job = new HdfsJdbcJob(HdfsJdbcJob.DEFAULT_DIRECTORY,
+//												 String.format("/%spartition*", DEFAULT_FILE_NAME),
+//												 HdfsJdbcJob.DEFAULT_TABLE_NAME,
+//												 HdfsJdbcJob.DEFAULT_NAMES);
+//
+//		for(int i = 0; i < 5; i++) {
+//			// Create a stream that writes to a file. This file will be used by the job.
+//			stream("dataSender" + i, sources.http(9000 + i) + XD_DELIMITER
+//											 + sinks.file(HdfsJdbcJob.DEFAULT_DIRECTORY, DEFAULT_FILE_NAME + "partition" + i).toDSL(), WAIT_TIME);
+//			waitForXD();
+//			sources.http(9000 + i).postData(data);
+//			waitForXD();
+//		}
+//
+//		job(job.toDSL());
+//		waitForXD();
+//
+//		for(int i = 0; i < 5; i++) {
+//			undeployStream("dataSender" + i);
+//			waitForXD();
+//		}
+//
+//		jobLaunch();
+//		waitForXD();
+//
+//		String query = String.format("SELECT data FROM %s", tableName);
+//
+//		List<String> results = jdbcSink.getJdbcTemplate().queryForList(query, String.class);
+//
+//		assertEquals(5, results.size());
+//
+//		for (String result : results) {
+//			assertEquals(data, result);
+//		}
+//	}
 
 	/**
 	 * Being a good steward, remove the result table from the DB and source file from hdfs.
